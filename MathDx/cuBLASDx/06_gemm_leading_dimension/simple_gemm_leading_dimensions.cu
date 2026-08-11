@@ -76,9 +76,9 @@ __launch_bounds__(BLASWithoutLD::max_threads_per_block) //
     using value_type = ValueType;
     extern __shared__ __align__(16) cublasdx::byte smem[];
 
-    auto a_global_tensor = cublasdx::make_tensor(a, BLASWithoutLD::get_layout_gmem_a());
-    auto b_global_tensor = cublasdx::make_tensor(b, BLASWithoutLD::get_layout_gmem_b());
-    auto c_global_tensor = cublasdx::make_tensor(c, BLASWithoutLD::get_layout_gmem_c());
+    auto a_global_tensor = cublasdx::make_tensor(a, BLASWithoutLD::get_layout_gmem_a(lda));
+    auto b_global_tensor = cublasdx::make_tensor(b, BLASWithoutLD::get_layout_gmem_b(ldb));
+    auto c_global_tensor = cublasdx::make_tensor(c, BLASWithoutLD::get_layout_gmem_c(ldc));
 
     auto [smem_a, smem_b, smem_c] = cublasdx::slice_shared_memory<BLASWithoutLD>(smem, lda, ldb, ldc);
     auto ta                       = cublasdx::make_tensor(smem_a, BLASWithoutLD::get_layout_smem_a(lda));
