@@ -33,6 +33,7 @@ __launch_bounds__(BLAS::max_threads_per_block) //
                      const ValueType  beta,
                      const ValueType* c,
                      ValueType*       output) {
+    CUBLASDX_SKIP_IF_NOT_APPLICABLE_SM(BLAS);
     using value_type = ValueType;
     extern __shared__ __align__(16) cublasdx::byte smem[];
 
@@ -71,12 +72,13 @@ __launch_bounds__(BLASWithoutLD::max_threads_per_block) //
                                 const ValueType*   c,
                                 const unsigned int ldc,
                                 ValueType*         output) {
+    CUBLASDX_SKIP_IF_NOT_APPLICABLE_SM(BLASWithoutLD);
     using value_type = ValueType;
     extern __shared__ __align__(16) cublasdx::byte smem[];
 
-    auto a_global_tensor = cublasdx::make_tensor(a, BLASWithoutLD::get_layout_gmem_a());
-    auto b_global_tensor = cublasdx::make_tensor(b, BLASWithoutLD::get_layout_gmem_b());
-    auto c_global_tensor = cublasdx::make_tensor(c, BLASWithoutLD::get_layout_gmem_c());
+    auto a_global_tensor = cublasdx::make_tensor(a, BLASWithoutLD::get_layout_gmem_a(lda));
+    auto b_global_tensor = cublasdx::make_tensor(b, BLASWithoutLD::get_layout_gmem_b(ldb));
+    auto c_global_tensor = cublasdx::make_tensor(c, BLASWithoutLD::get_layout_gmem_c(ldc));
 
     auto [smem_a, smem_b, smem_c] = cublasdx::slice_shared_memory<BLASWithoutLD>(smem, lda, ldb, ldc);
     auto ta                       = cublasdx::make_tensor(smem_a, BLASWithoutLD::get_layout_smem_a(lda));
@@ -165,7 +167,7 @@ int simple_gemm_with_leading_dimensions() {
     using BLAS       = decltype(BLASWithoutLD() + cublasdx::LeadingDimension<lda, ldb, ldc>());
     using value_type = typename example::uniform_value_type_t<BLAS>;
 
-    // Allocate managed memory for a, b, c, and output
+    // Allocate device memory for a, b, c, and output
     value_type* inputs;
     value_type* output;
 
