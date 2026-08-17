@@ -76,7 +76,7 @@ __global__ void gemm_kernel(const ValueType* a,
     cublasdx::copy<BLAS, alignment::c>(c_shared_tensor, out_global_tensor);
 }
 
-// This is an example of two fp32 general matrix-matrix multiplications (GEMM) performed in a single CUDA block:
+// This is an example of two fp64 general matrix-matrix multiplications (GEMM) performed in a single CUDA block:
 //
 //              C(X) = alpha * A(X) * B(X) + beta * C(X)
 //
